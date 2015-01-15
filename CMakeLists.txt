@@ -292,7 +292,7 @@ endif ()
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
 	target_link_libraries(objc -lpthread)
-endif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+endif ()
 
 #
 # Installation
@@ -333,6 +333,7 @@ else ()
 		ARGS "${GNUSTEP_CONFIG}" "--variable=GNUSTEP_${GNUSTEP_INSTALL_TYPE}_HEADERS"
 		OUTPUT_VARIABLE HEADER_INSTALL_PATH)
 endif ()
+message(STATUS "GNUstep install type set to ${GNUSTEP_INSTALL_TYPE}")
 
 install(TARGETS ${INSTALL_TARGETS}
 	LIBRARY DESTINATION ${LIB_INSTALL_PATH}
