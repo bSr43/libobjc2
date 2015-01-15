@@ -107,10 +107,10 @@ static struct wx_buffer alloc_buffer(size_t size)
 		void *w = mmap(NULL, PAGE_SIZE, PROT_WRITE, MAP_SHARED, fd, 0);
 		executeBuffer = mmap(NULL, PAGE_SIZE, PROT_READ|PROT_EXEC, MAP_SHARED, fd, 0);
 #else /* __MINGW32__ */
-	    HANDLE fm = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_EXECUTE_READWRITE, 0, PAGE_SIZE, NULL);
-    	void *w = MapViewOfFile(fm, FILE_MAP_READ|FILE_MAP_WRITE|FILE_MAP_EXECUTE, 0, 0, PAGE_SIZE);
+		HANDLE fm = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_EXECUTE_READWRITE, 0, PAGE_SIZE, NULL);
+		void *w = MapViewOfFile(fm, FILE_MAP_READ|FILE_MAP_WRITE|FILE_MAP_EXECUTE, 0, 0, PAGE_SIZE);
 		fflush(stdout);
-    	CloseHandle(fm);
+		CloseHandle(fm);
 		executeBuffer = w;
 #endif /* __MINGW32__ */
 		*((void**)w) = writeBuffer;
