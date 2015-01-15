@@ -69,6 +69,10 @@ set(libobjc_HDRS
 	objc/slot.h
 )
 
+if (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+	set(libobjc_C_SRCS ${libobjc_C_SRCS} sleep.c)
+endif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+
 set(libobjcxx_CXX_SRCS objcxx_eh.cc)
 
 # For release builds, we disable spamming the terminal with warnings about
@@ -285,6 +289,10 @@ if (APPLE)
 	set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,-undefined,dynamic_lookup")
 	set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,-undefined,dynamic_lookup")
 endif ()
+
+if (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+	target_link_libraries(objc -lpthread)
+endif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
 
 #
 # Installation

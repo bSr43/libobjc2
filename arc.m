@@ -12,6 +12,9 @@
 #import "objc/blocks_runtime.h"
 
 #ifndef NO_PTHREADS
+#ifdef __MINGW32__
+#define _TIMESPEC_DEFINED
+#endif /* __MINGW32__ */
 #include <pthread.h>
 pthread_key_t ARCThreadKey;
 #endif

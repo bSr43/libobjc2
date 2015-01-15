@@ -5,8 +5,9 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
+#ifndef __MINGW32__
 #include <sys/resource.h>
-
+#endif /* __MINGW32__ */
 
 static BOOL methodCalled = NO;
 

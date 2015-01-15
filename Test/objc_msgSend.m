@@ -7,6 +7,22 @@
 
 //#define assert(x) if (!(x)) { printf("Failed %d\n", __LINE__); }
 
+#ifdef __MINGW32__
+#include <stdlib.h>
+
+int vasprintf( char **sptr, const char *fmt, va_list argv )
+{
+	int retval;
+
+	const int maxsize = 1024*1024;
+	char *buffer = (char *) malloc (maxsize);
+	retval = vsnprintf(buffer, maxsize, fmt, argv);
+	*sptr = (char *) realloc(buffer, retval + 1);
+
+	return retval;
+}
+#endif /* __MINGW32__ */
+
 id objc_msgSend(id, SEL, ...);
 
 typedef struct { int a,b,c,d,e; } s;

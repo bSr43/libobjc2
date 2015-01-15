@@ -10,12 +10,21 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifndef __MINGW32__
 #include <sys/mman.h>
+#endif /* __MINGW32__ */
 #include "objc/runtime.h"
 #include "objc/blocks_runtime.h"
 #include "blocks_runtime.h"
 #include "lock.h"
 #include "visibility.h"
+
+#ifdef __MINGW32__
+#ifndef FILE_MAP_EXECUTE
+#define FILE_MAP_EXECUTE    0x0020
+#endif /* FILE_MAP_EXECUTE */
+#endif /* !__MINGW32__ */
+
 
 #ifndef __has_builtin
 #define __has_builtin(x) 0
@@ -43,6 +52,7 @@ static mutex_t trampoline_lock;
 static char *tmpPattern;
 static void initTmpFile(void)
 {
+#ifndef __MINGW32__
 	char *tmp = getenv("TMPDIR");
 	if (NULL == tmp)
 	{
@@ -52,14 +62,19 @@ static void initTmpFile(void)
 	{
 		abort();
 	}
+#endif /* __MINGW32__ */
 }
 static int getAnonMemFd(void)
 {
+#ifndef __MINGW32__
 	const char *pattern = strdup(tmpPattern);
 	int fd = mkstemp(pattern);
 	unlink(pattern);
-	free(pattern);
+	free((char *) pattern);
 	return fd;
+#else /* __MINGW32__ */
+	return -1;
+#endif /* __MINGW32__ */
 }
 #else
 static void initTmpFile(void) {}
@@ -86,10 +101,18 @@ static struct wx_buffer alloc_buffer(size_t size)
 	LOCK_FOR_SCOPE(&trampoline_lock);
 	if ((0 == offset) || (offset + size >= PAGE_SIZE))
 	{
+#ifndef __MINGW32__
 		int fd = getAnonMemFd();
 		ftruncate(fd, PAGE_SIZE);
 		void *w = mmap(NULL, PAGE_SIZE, PROT_WRITE, MAP_SHARED, fd, 0);
 		executeBuffer = mmap(NULL, PAGE_SIZE, PROT_READ|PROT_EXEC, MAP_SHARED, fd, 0);
+#else /* __MINGW32__ */
+	    HANDLE fm = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_EXECUTE_READWRITE, 0, PAGE_SIZE, NULL);
+    	void *w = MapViewOfFile(fm, FILE_MAP_READ|FILE_MAP_WRITE|FILE_MAP_EXECUTE, 0, 0, PAGE_SIZE);
+		fflush(stdout);
+    	CloseHandle(fm);
+		executeBuffer = w;
+#endif /* __MINGW32__ */
 		*((void**)w) = writeBuffer;
 		writeBuffer = w;
 		offset = sizeof(void*);
