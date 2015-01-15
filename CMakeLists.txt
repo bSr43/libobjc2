@@ -71,7 +71,7 @@ set(libobjc_HDRS
 
 if (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
 	set(libobjc_C_SRCS ${libobjc_C_SRCS} sleep.c)
-endif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+endif ()
 
 set(libobjcxx_CXX_SRCS objcxx_eh.cc)
 
@@ -298,11 +298,11 @@ endif (CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
 # Installation
 #
 
-
+find_program(BASH_EXEC bash)
 find_program(GNUSTEP_CONFIG gnustep-config)
 if (GNUSTEP_CONFIG)
-	EXEC_PROGRAM(gnustep-config
-		ARGS "--installation-domain-for=libobjc2"
+	EXEC_PROGRAM("${BASH_EXEC}"
+		ARGS "${GNUSTEP_CONFIG}" "--installation-domain-for=libobjc2"
 		OUTPUT_VARIABLE DEFAULT_INSTALL_TYPE)
 endif ()
 
@@ -326,14 +326,13 @@ if (${GNUSTEP_INSTALL_TYPE} STREQUAL "NONE")
 		"Subdirectory of the root prefix where libraries are installed.")
 	SET(HEADER_INSTALL_PATH "include")
 else ()
-	EXEC_PROGRAM(gnustep-config
-		ARGS "--variable=GNUSTEP_${GNUSTEP_INSTALL_TYPE}_LIBRARIES"
+	EXEC_PROGRAM("${BASH_EXEC}"
+		ARGS "${GNUSTEP_CONFIG}" "--variable=GNUSTEP_${GNUSTEP_INSTALL_TYPE}_LIBRARIES"
 		OUTPUT_VARIABLE LIB_INSTALL_PATH)
-	EXEC_PROGRAM(gnustep-config
-		ARGS "--variable=GNUSTEP_${GNUSTEP_INSTALL_TYPE}_HEADERS"
+	EXEC_PROGRAM("${BASH_EXEC}"
+		ARGS "${GNUSTEP_CONFIG}" "--variable=GNUSTEP_${GNUSTEP_INSTALL_TYPE}_HEADERS"
 		OUTPUT_VARIABLE HEADER_INSTALL_PATH)
 endif ()
-message(STATUS "GNUstep install type set to ${GNUSTEP_INSTALL_TYPE}")
 
 install(TARGETS ${INSTALL_TARGETS}
 	LIBRARY DESTINATION ${LIB_INSTALL_PATH}
